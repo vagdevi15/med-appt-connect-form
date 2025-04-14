@@ -73,6 +73,20 @@ const timeSlots = [
 const PHONE_REGEX = /^\d{10}$/; // Simple 10-digit validation
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+// Define the form values type
+type FormValues = {
+  specialty?: string;
+  location?: string;
+  doctor?: string;
+  appointmentType: string;
+  appointmentDate?: Date;
+  appointmentTime?: string;
+  fullName?: string;
+  phoneNumber?: string;
+  email?: string;
+  notes?: string;
+};
+
 const AppointmentForm = () => {
   const [availableDoctors, setAvailableDoctors] = useState(doctors);
   
@@ -90,8 +104,8 @@ const AppointmentForm = () => {
   const [enteredPhoneCode, setEnteredPhoneCode] = useState("");
   const [enteredEmailCode, setEnteredEmailCode] = useState("");
   
-  // Initialize form
-  const form = useForm({
+  // Initialize form with proper types
+  const form = useForm<FormValues>({
     defaultValues: {
       appointmentType: "in-person",
     },
@@ -121,7 +135,7 @@ const AppointmentForm = () => {
     const phone = form.getValues("phoneNumber");
     
     // Validate phone number first
-    if (!PHONE_REGEX.test(phone)) {
+    if (!phone || !PHONE_REGEX.test(phone)) {
       toast("Invalid phone number", {
         description: "Please enter a valid 10-digit phone number."
       });
@@ -139,7 +153,7 @@ const AppointmentForm = () => {
     const email = form.getValues("email");
     
     // Validate email first
-    if (!EMAIL_REGEX.test(email)) {
+    if (!email || !EMAIL_REGEX.test(email)) {
       toast("Invalid email address", {
         description: "Please enter a valid email address."
       });
@@ -154,7 +168,7 @@ const AppointmentForm = () => {
   
   // Verify phone code
   const verifyPhoneCode = () => {
-    if (enteredPhoneCode === phoneVerificationCode) {
+    if (verifyCode(phoneVerificationCode, enteredPhoneCode)) {
       setPhoneVerified(true);
       setPhoneVerificationOpen(false);
       toast("Phone verified", {
@@ -169,7 +183,7 @@ const AppointmentForm = () => {
   
   // Verify email code
   const verifyEmailCode = () => {
-    if (enteredEmailCode === emailVerificationCode) {
+    if (verifyCode(emailVerificationCode, enteredEmailCode)) {
       setEmailVerified(true);
       setEmailVerificationOpen(false);
       toast("Email verified", {
@@ -192,7 +206,7 @@ const AppointmentForm = () => {
   }, [email]);
   
   // Form submission
-  function onSubmit(data) {
+  function onSubmit(data: FormValues) {
     // Check if phone and email are verified
     if (!phoneVerified) {
       toast("Phone verification required", {
@@ -509,7 +523,7 @@ const AppointmentForm = () => {
                           variant="outline"
                           className="whitespace-nowrap h-10 sm:w-auto"
                           onClick={handlePhoneVerification}
-                          disabled={!PHONE_REGEX.test(field.value) || phoneVerified}
+                          disabled={!phoneNumber || !PHONE_REGEX.test(phoneNumber) || phoneVerified}
                         >
                           {phoneVerified ? "Verified" : "Verify Number"}
                         </Button>
@@ -552,7 +566,7 @@ const AppointmentForm = () => {
                         variant="outline"
                         className="whitespace-nowrap h-10 sm:w-auto"
                         onClick={handleEmailVerification}
-                        disabled={!EMAIL_REGEX.test(field.value) || emailVerified}
+                        disabled={!email || !EMAIL_REGEX.test(email) || emailVerified}
                       >
                         {emailVerified ? "Verified" : "Verify Email"}
                       </Button>

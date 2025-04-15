@@ -48,17 +48,102 @@ const locations = [
   { id: 6, name: "Hastinapuram" },
 ];
 
+// Expanded doctors list with 3 doctors for each specialty where possible
 const doctors = [
-  { id: 1, name: "Dr. SAI SUDHAKAR" , specialtyId: 1 },
-  { id: 2, name: "Dr. Sarah Johnson", specialtyId: 2 },
-  { id: 3, name: "Dr. Robert Chen", specialtyId: 3 },
-  { id: 4, name: "Dr. Emily Davis", specialtyId: 4 },
-  { id: 5, name: "Dr. Michael Wilson", specialtyId: 5 },
+  // General Surgeon
+  { id: 1, name: "Dr. SAI SUDHAKAR", specialtyId: 1 },
   { id: 6, name: "Dr. Jessica Brown", specialtyId: 1 },
   { id: 7, name: "Dr. James Williams", specialtyId: 1 },
-  { id: 8, name: "Dr. Patricia Miller", specialtyId: 1 },
+  
+  // Anesthesia & Critical Care
+  { id: 2, name: "Dr. Sarah Johnson", specialtyId: 2 },
   { id: 9, name: "Dr. John Martinez", specialtyId: 2 },
+  { id: 21, name: "Dr. Lisa Anderson", specialtyId: 2 },
+  
+  // Consultant Orthopedic, Arthroplasty & Arthroscopy
+  { id: 3, name: "Dr. Robert Chen", specialtyId: 3 },
   { id: 10, name: "Dr. Jennifer Taylor", specialtyId: 3 },
+  { id: 22, name: "Dr. Thomas Wright", specialtyId: 3 },
+  
+  // Dermatologist
+  { id: 4, name: "Dr. Emily Davis", specialtyId: 4 },
+  { id: 23, name: "Dr. Andrew Miller", specialtyId: 4 },
+  { id: 24, name: "Dr. Katherine Lewis", specialtyId: 4 },
+  
+  // E.N.T Specialist
+  { id: 5, name: "Dr. Michael Wilson", specialtyId: 5 },
+  { id: 25, name: "Dr. Richard Moore", specialtyId: 5 },
+  { id: 26, name: "Dr. Olivia Garcia", specialtyId: 5 },
+  
+  // Gastroenterology
+  { id: 27, name: "Dr. Daniel White", specialtyId: 6 },
+  { id: 28, name: "Dr. Sophia Lee", specialtyId: 6 },
+  { id: 29, name: "Dr. Benjamin Clark", specialtyId: 6 },
+  
+  // General Medicine
+  { id: 30, name: "Dr. Abigail Turner", specialtyId: 7 },
+  { id: 31, name: "Dr. Noah Harris", specialtyId: 7 },
+  { id: 32, name: "Dr. Isabella Young", specialtyId: 7 },
+  
+  // Gynecologist & Obstetrician
+  { id: 33, name: "Dr. Amelia Robinson", specialtyId: 8 },
+  { id: 34, name: "Dr. Charlotte Scott", specialtyId: 8 },
+  { id: 35, name: "Dr. Victoria King", specialtyId: 8 },
+  
+  // Interventional Cardiologist
+  { id: 36, name: "Dr. William Baker", specialtyId: 9 },
+  { id: 37, name: "Dr. Henry Adams", specialtyId: 9 },
+  { id: 38, name: "Dr. Elizabeth Green", specialtyId: 9 },
+  
+  // Nephrologist
+  { id: 39, name: "Dr. Grace Nelson", specialtyId: 10 },
+  { id: 40, name: "Dr. Samuel Hill", specialtyId: 10 },
+  { id: 41, name: "Dr. Lillian Wright", specialtyId: 10 },
+  
+  // Neuro Physician
+  { id: 42, name: "Dr. Joseph Mitchell", specialtyId: 11 },
+  { id: 43, name: "Dr. Anthony Parker", specialtyId: 11 },
+  { id: 44, name: "Dr. Evelyn Cooper", specialtyId: 11 },
+  
+  // Neuro Surgeon
+  { id: 45, name: "Dr. Sebastian Reed", specialtyId: 12 },
+  { id: 46, name: "Dr. Natalie Ross", specialtyId: 12 },
+  { id: 47, name: "Dr. Christopher Bailey", specialtyId: 12 },
+  
+  // Oral Maxillofacial Surgeon
+  { id: 48, name: "Dr. Alexander Ward", specialtyId: 13 },
+  { id: 49, name: "Dr. Madison Foster", specialtyId: 13 },
+  { id: 50, name: "Dr. Gabriel Evans", specialtyId: 13 },
+  
+  // Orthopedic Surgeon
+  { id: 51, name: "Dr. Jonathan Kelly", specialtyId: 14 },
+  { id: 52, name: "Dr. Emma Rivera", specialtyId: 14 },
+  { id: 53, name: "Dr. Matthew Cox", specialtyId: 14 },
+  
+  // Pediatrician
+  { id: 54, name: "Dr. Sophie Morgan", specialtyId: 15 },
+  { id: 55, name: "Dr. Theodore Hughes", specialtyId: 15 },
+  { id: 56, name: "Dr. Penelope Watson", specialtyId: 15 },
+  
+  // Physiotherapist
+  { id: 57, name: "Dr. Nicholas Brooks", specialtyId: 16 },
+  { id: 58, name: "Dr. Eleanor Price", specialtyId: 16 },
+  { id: 59, name: "Dr. Lucas Collins", specialtyId: 16 },
+  
+  // Plastic & Cosmetic Surgeon
+  { id: 60, name: "Dr. Audrey Bennett", specialtyId: 17 },
+  { id: 61, name: "Dr. Oliver Powell", specialtyId: 17 },
+  { id: 62, name: "Dr. Scarlett Wood", specialtyId: 17 },
+  
+  // Pulmonologist
+  { id: 63, name: "Dr. Calvin Stewart", specialtyId: 18 },
+  { id: 64, name: "Dr. Hazel Morris", specialtyId: 18 },
+  { id: 65, name: "Dr. Ryan Phillips", specialtyId: 18 },
+  
+  // Rheumatologist
+  { id: 66, name: "Dr. Julia Sanders", specialtyId: 19 },
+  { id: 67, name: "Dr. Zachary Peterson", specialtyId: 19 },
+  { id: 68, name: "Dr. Madeline Butler", specialtyId: 19 },
 ];
 
 // Time slots

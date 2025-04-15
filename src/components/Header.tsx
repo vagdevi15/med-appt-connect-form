@@ -14,7 +14,7 @@ const NavLink = ({ href, label, external = true }: NavLinkProps) => {
     return (
       <a 
         href={href} 
-        className="text-gray-700 hover:text-wellness-blue font-medium text-sm transition-colors"
+        className="text-wellness-darkGray hover:text-wellness-blue font-medium text-sm transition-colors"
         target="_blank" 
         rel="noopener noreferrer"
       >
@@ -24,7 +24,7 @@ const NavLink = ({ href, label, external = true }: NavLinkProps) => {
   }
   
   return (
-    <Link to={href} className="text-gray-700 hover:text-wellness-blue font-medium text-sm transition-colors">
+    <Link to={href} className="text-wellness-darkGray hover:text-wellness-blue font-medium text-sm transition-colors">
       {label}
     </Link>
   );
@@ -43,7 +43,7 @@ const Header = () => {
         <div className="flex items-center mb-4 md:mb-0">
           <Link to="/" className="flex items-center">
             <img 
-              src="/lovable-uploads/a5a6b512-b70f-44b2-ac4d-be8da2a39ba3.png" 
+              src="/lovable-uploads/57ed3ded-aa5a-47fc-aafb-fe44dbfd2b3a.png" 
               alt="Wellness Hospitals Logo" 
               className="h-16 md:h-20"
             />

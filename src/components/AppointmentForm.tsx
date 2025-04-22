@@ -1,8 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock, Mail, Phone, Check, X } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { Calendar as CalendarIcon, Clock, Mail, Phone, Check } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -14,306 +12,330 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { sendVerificationCode, verifyCode } from "@/utils/verificationService";
-
-// Sample data
-const specialties = [
-  { id: 1, name: "General Surgeon" },
-  { id: 2, name: "Anesthesia & Critical Care" },
-  { id: 3, name: "Consultant Orthopedic, Arthroplasty & Arthroscopy" },
-  { id: 4, name: "Dermatologist" },
-  { id: 5, name: "E.N.T Specialist" },
-  { id: 6, name: "Gastroenterology" },
-  { id: 7, name: "General Medicine" },
-  { id: 8, name: "Gynecologist & Obstetrician " },
-  { id: 9, name: "Interventional Cardiologist" },
-  { id: 10, name: "Nephrologist" },
-  { id: 11, name: "Neuro Physician" },
-  { id: 12, name: "Neuro Surgeon" },
-  { id: 13, name: "Oral Maxillofacial Surgeon" },
-  { id: 14, name: "Orthopedic Surgeon" },
-  { id: 15, name: "Pediatrician" },
-  { id: 16, name: "Physiotherapist" },
-  { id: 17, name: "Plastic & Cosmetic Surgeon"},
-  { id: 18, name: "Pulmonologist" },
-  { id: 19, name: "Rheumatologist" },
-];
-
-const locations = [
-  { id: 1, name: "Ameerpet - DK Road" },
-  { id: 2, name: "Ameerpet - Lal-Banglow" },
-  { id: 3, name: "Kompally" },
-  { id: 4, name: "Ameerpet - Shyamkaran Road"},
-  { id: 5, name: "Sangareddy" },
-  { id: 6, name: "Hastinapuram" },
-];
-
-// Expanded doctors list with 3 doctors for each specialty where possible
-const doctors = [
-  // General Surgeon
-  { id: 1, name: "Dr. SAI SUDHAKAR", specialtyId: 1 },
-  { id: 6, name: "Dr. Jessica Brown", specialtyId: 1 },
-  { id: 7, name: "Dr. James Williams", specialtyId: 1 },
-  
-  // Anesthesia & Critical Care
-  { id: 2, name: "Dr. Sarah Johnson", specialtyId: 2 },
-  { id: 9, name: "Dr. John Martinez", specialtyId: 2 },
-  { id: 21, name: "Dr. Lisa Anderson", specialtyId: 2 },
-  
-  // Consultant Orthopedic, Arthroplasty & Arthroscopy
-  { id: 3, name: "Dr. Robert Chen", specialtyId: 3 },
-  { id: 10, name: "Dr. Jennifer Taylor", specialtyId: 3 },
-  { id: 22, name: "Dr. Thomas Wright", specialtyId: 3 },
-  
-  // Dermatologist
-  { id: 4, name: "Dr. Emily Davis", specialtyId: 4 },
-  { id: 23, name: "Dr. Andrew Miller", specialtyId: 4 },
-  { id: 24, name: "Dr. Katherine Lewis", specialtyId: 4 },
-  
-  // E.N.T Specialist
-  { id: 5, name: "Dr. Michael Wilson", specialtyId: 5 },
-  { id: 25, name: "Dr. Richard Moore", specialtyId: 5 },
-  { id: 26, name: "Dr. Olivia Garcia", specialtyId: 5 },
-  
-  // Gastroenterology
-  { id: 27, name: "Dr. Daniel White", specialtyId: 6 },
-  { id: 28, name: "Dr. Sophia Lee", specialtyId: 6 },
-  { id: 29, name: "Dr. Benjamin Clark", specialtyId: 6 },
-  
-  // General Medicine
-  { id: 30, name: "Dr. Abigail Turner", specialtyId: 7 },
-  { id: 31, name: "Dr. Noah Harris", specialtyId: 7 },
-  { id: 32, name: "Dr. Isabella Young", specialtyId: 7 },
-  
-  // Gynecologist & Obstetrician
-  { id: 33, name: "Dr. Amelia Robinson", specialtyId: 8 },
-  { id: 34, name: "Dr. Charlotte Scott", specialtyId: 8 },
-  { id: 35, name: "Dr. Victoria King", specialtyId: 8 },
-  
-  // Interventional Cardiologist
-  { id: 36, name: "Dr. William Baker", specialtyId: 9 },
-  { id: 37, name: "Dr. Henry Adams", specialtyId: 9 },
-  { id: 38, name: "Dr. Elizabeth Green", specialtyId: 9 },
-  
-  // Nephrologist
-  { id: 39, name: "Dr. Grace Nelson", specialtyId: 10 },
-  { id: 40, name: "Dr. Samuel Hill", specialtyId: 10 },
-  { id: 41, name: "Dr. Lillian Wright", specialtyId: 10 },
-  
-  // Neuro Physician
-  { id: 42, name: "Dr. Joseph Mitchell", specialtyId: 11 },
-  { id: 43, name: "Dr. Anthony Parker", specialtyId: 11 },
-  { id: 44, name: "Dr. Evelyn Cooper", specialtyId: 11 },
-  
-  // Neuro Surgeon
-  { id: 45, name: "Dr. Sebastian Reed", specialtyId: 12 },
-  { id: 46, name: "Dr. Natalie Ross", specialtyId: 12 },
-  { id: 47, name: "Dr. Christopher Bailey", specialtyId: 12 },
-  
-  // Oral Maxillofacial Surgeon
-  { id: 48, name: "Dr. Alexander Ward", specialtyId: 13 },
-  { id: 49, name: "Dr. Madison Foster", specialtyId: 13 },
-  { id: 50, name: "Dr. Gabriel Evans", specialtyId: 13 },
-  
-  // Orthopedic Surgeon
-  { id: 51, name: "Dr. Jonathan Kelly", specialtyId: 14 },
-  { id: 52, name: "Dr. Emma Rivera", specialtyId: 14 },
-  { id: 53, name: "Dr. Matthew Cox", specialtyId: 14 },
-  
-  // Pediatrician
-  { id: 54, name: "Dr. Sophie Morgan", specialtyId: 15 },
-  { id: 55, name: "Dr. Theodore Hughes", specialtyId: 15 },
-  { id: 56, name: "Dr. Penelope Watson", specialtyId: 15 },
-  
-  // Physiotherapist
-  { id: 57, name: "Dr. Nicholas Brooks", specialtyId: 16 },
-  { id: 58, name: "Dr. Eleanor Price", specialtyId: 16 },
-  { id: 59, name: "Dr. Lucas Collins", specialtyId: 16 },
-  
-  // Plastic & Cosmetic Surgeon
-  { id: 60, name: "Dr. Audrey Bennett", specialtyId: 17 },
-  { id: 61, name: "Dr. Oliver Powell", specialtyId: 17 },
-  { id: 62, name: "Dr. Scarlett Wood", specialtyId: 17 },
-  
-  // Pulmonologist
-  { id: 63, name: "Dr. Calvin Stewart", specialtyId: 18 },
-  { id: 64, name: "Dr. Hazel Morris", specialtyId: 18 },
-  { id: 65, name: "Dr. Ryan Phillips", specialtyId: 18 },
-  
-  // Rheumatologist
-  { id: 66, name: "Dr. Julia Sanders", specialtyId: 19 },
-  { id: 67, name: "Dr. Zachary Peterson", specialtyId: 19 },
-  { id: 68, name: "Dr. Madeline Butler", specialtyId: 19 },
-];
-
-// Time slots
-const timeSlots = [
-  "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
-  "11:00 AM", "11:30 AM", "1:00 PM", "1:30 PM",
-  "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM",
-  "4:00 PM", "4:30 PM"
-];
-
-// Regex patterns for validation
-const PHONE_REGEX = /^\d{10}$/; // Simple 10-digit validation
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+import { useForm } from "react-hook-form";
+import { api, Department, Center, Doctor } from '@/utils/api';
 
 // Define the form values type
 type FormValues = {
-  specialty?: string;
-  location?: string;
-  doctor?: string;
+  specialty: string;
+  location: string;
+  doctor: string;
   appointmentType: string;
   appointmentDate?: Date;
   appointmentTime?: string;
-  fullName?: string;
-  phoneNumber?: string;
-  email?: string;
+  fullName: string;
+  phoneNumber: string;
+  email: string;
   notes?: string;
 };
 
+// Mock verification service (replace with actual implementation)
+const sendVerificationCode = (type, value) => {
+  console.log(`Sending verification code to ${type}: ${value}`);
+  return '123456'; // Mock code
+};
+
+const verifyCode = (expected, actual) => {
+  return expected === actual;
+};
+
+const PHONE_REGEX = /^\d{10}$/; // Simple 10-digit validation
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 const AppointmentForm = () => {
-  const [availableDoctors, setAvailableDoctors] = useState(doctors);
-  
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [centers, setCenters] = useState<Center[]>([]);
+  const [allDoctors, setAllDoctors] = useState<Doctor[]>([]);
+  const [availableDoctors, setAvailableDoctors] = useState<Doctor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [availableDates, setAvailableDates] = useState<Date[]>([]);
+  const [availableTimes, setAvailableTimes] = useState<string[]>([]);
+
   // Verification states
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
-  
+
   // Verification dialogs
   const [phoneVerificationOpen, setPhoneVerificationOpen] = useState(false);
   const [emailVerificationOpen, setEmailVerificationOpen] = useState(false);
-  
+
   // Verification codes
   const [phoneVerificationCode, setPhoneVerificationCode] = useState("");
-  const [emailVerificationCode, setEmailVerificationCode] = useState("");
   const [enteredPhoneCode, setEnteredPhoneCode] = useState("");
+  const [emailVerificationCode, setEmailVerificationCode] = useState("");
   const [enteredEmailCode, setEnteredEmailCode] = useState("");
-  
-  // Initialize form with proper types
+
+  // Initialize form with proper types and all required default values
   const form = useForm<FormValues>({
     defaultValues: {
+      specialty: "",
+      location: "",
+      doctor: "",
       appointmentType: "in-person",
+      fullName: "",
+      phoneNumber: "",
+      email: "",
+      notes: ""
     },
     mode: "onChange", // Validate on change
   });
-  
-  // Watch specialty to filter doctors
+
+  // Watch form values
   const specialty = form.watch("specialty");
+  const location = form.watch("location");
+  const doctor = form.watch("doctor");
   const phoneNumber = form.watch("phoneNumber");
   const email = form.watch("email");
-  
-  // Update available doctors when specialty changes - MODIFIED TO LIMIT TO 3 DOCTORS
+  const selectedDate = form.watch("appointmentDate");
+
+  // Load initial data
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const [depts, ctrs, docs] = await Promise.all([
+          api.getDepartments(),
+          api.getCenters(),
+          api.getDoctors()
+        ]);
+        
+        console.log('Departments:', depts);
+        console.log('Centers:', ctrs);
+        console.log('Doctors:', docs);
+
+        setDepartments(depts);
+        setCenters(ctrs);
+        setAllDoctors(docs);
+        setAvailableDoctors(docs); // Initially show all doctors
+      } catch (error) {
+        console.error('Failed to load data:', error);
+        toast.error('Failed to load data. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Update available doctors when specialty changes
   useEffect(() => {
     if (specialty) {
-      const specialtyId = parseInt(specialty);
-      const filteredDoctors = doctors
-        .filter((doctor) => doctor.specialtyId === specialtyId)
-        .slice(0, 3); // Limit to maximum 3 doctors
-      
+      const filteredDoctors = allDoctors.filter(doc => doc.dept_id === specialty);
       setAvailableDoctors(filteredDoctors);
-      form.setValue("doctor", "");
+      
+      // If the currently selected doctor is not in this department, clear the selection
+      const currentDoctor = form.getValues("doctor");
+      if (currentDoctor) {
+        const doctorStillValid = filteredDoctors.some(doc => doc.doctor_id === currentDoctor);
+        if (!doctorStillValid) {
+          form.setValue("doctor", "");
+        }
+      }
+    } else {
+      // If no specialty is selected, show all doctors
+      setAvailableDoctors(allDoctors);
     }
-  }, [specialty, form]);
-  
+  }, [specialty, allDoctors, form]);
+
+  // When doctor changes, update the department if needed
+  useEffect(() => {
+    if (doctor) {
+      const selectedDoctor = allDoctors.find(doc => doc.doctor_id === doctor);
+      if (selectedDoctor && selectedDoctor.dept_id !== specialty) {
+        form.setValue("specialty", selectedDoctor.dept_id);
+      }
+      
+      // Load available slots for this doctor
+      const loadAvailableSlots = async () => {
+        try {
+          console.log('Checking available slots for doctor:', doctor);
+          const slotsResponse = await api.checkAvailableSlots(doctor);
+          console.log('Slots response:', slotsResponse);
+          
+          if (slotsResponse && slotsResponse.avaiable_slots && slotsResponse.avaiable_slots.length > 0) {
+            setAvailableSlots(slotsResponse.avaiable_slots);
+            
+            // Extract unique dates from slots
+            const dateSet = new Set<string>();
+            const dateObjects: Date[] = [];
+            
+            slotsResponse.avaiable_slots.forEach(slot => {
+              const dateStr = slot.split('T')[0]; // Extract date part (YYYY-MM-DD)
+              if (!dateSet.has(dateStr)) {
+                dateSet.add(dateStr);
+                dateObjects.push(new Date(dateStr));
+              }
+            });
+            
+            console.log('Available dates:', dateObjects);
+            setAvailableDates(dateObjects);
+            
+            // Clear the selected date and time since we have new slots
+            form.setValue("appointmentDate", undefined);
+            form.setValue("appointmentTime", undefined);
+          } else {
+            setAvailableSlots([]);
+            setAvailableDates([]);
+            toast.warning('No available slots found for this doctor');
+          }
+        } catch (error) {
+          console.error('Failed to load available slots:', error);
+          toast.error('Failed to load available time slots. Please try again.');
+        }
+      };
+      
+      loadAvailableSlots();
+    }
+  }, [doctor, allDoctors, specialty, form]);
+
+  // When selected date changes, update available times
+  useEffect(() => {
+    if (selectedDate && availableSlots.length > 0) {
+      const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
+      
+      // Filter slots for the selected date and extract times
+      const timesForDate = availableSlots
+        .filter(slot => slot.startsWith(selectedDateStr))
+        .map(slot => {
+          const timeStr = slot.split('T')[1].split('.')[0]; // Extract time part without milliseconds
+          const [hours, minutes, seconds] = timeStr.split(':');
+          const hour = parseInt(hours);
+          const ampm = hour >= 12 ? 'PM' : 'AM';
+          const hour12 = hour % 12 || 12;
+          return `${hour12}:${minutes} ${ampm}`;
+        });
+      
+      console.log('Available times for selected date:', timesForDate);
+      setAvailableTimes(timesForDate);
+      
+      // Clear selected time since date changed
+      form.setValue("appointmentTime", undefined);
+    } else {
+      setAvailableTimes([]);
+    }
+  }, [selectedDate, availableSlots, form]);
+
   // Handle phone verification
   const handlePhoneVerification = () => {
     const phone = form.getValues("phoneNumber");
-    
+
     // Validate phone number first
     if (!phone || !PHONE_REGEX.test(phone)) {
-      toast("Invalid phone number", {
-        description: "Please enter a valid 10-digit phone number."
-      });
+      toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
-    
+
     // Send verification code
     const code = sendVerificationCode("phone", phone);
     setPhoneVerificationCode(code);
     setPhoneVerificationOpen(true);
   };
-  
+
   // Handle email verification
   const handleEmailVerification = () => {
     const email = form.getValues("email");
-    
+
     // Validate email first
     if (!email || !EMAIL_REGEX.test(email)) {
-      toast("Invalid email address", {
-        description: "Please enter a valid email address."
-      });
+      toast.error("Please enter a valid email address.");
       return;
     }
-    
+
     // Send verification code
     const code = sendVerificationCode("email", email);
     setEmailVerificationCode(code);
     setEmailVerificationOpen(true);
   };
-  
+
   // Verify phone code
   const verifyPhoneCode = () => {
     if (verifyCode(phoneVerificationCode, enteredPhoneCode)) {
       setPhoneVerified(true);
       setPhoneVerificationOpen(false);
-      toast("Phone verified", {
-        description: "Your phone number has been verified successfully."
-      });
+      toast.success("Your phone number has been verified successfully.");
     } else {
-      toast("Invalid code", {
-        description: "The verification code you entered is incorrect. Please try again."
-      });
+      toast.error("The verification code you entered is incorrect. Please try again.");
     }
   };
-  
+
   // Verify email code
   const verifyEmailCode = () => {
     if (verifyCode(emailVerificationCode, enteredEmailCode)) {
       setEmailVerified(true);
       setEmailVerificationOpen(false);
-      toast("Email verified", {
-        description: "Your email address has been verified successfully."
-      });
+      toast.success("Your email address has been verified successfully.");
     } else {
-      toast("Invalid code", {
-        description: "The verification code you entered is incorrect. Please try again."
-      });
+      toast.error("The verification code you entered is incorrect. Please try again.");
     }
   };
-  
+
   // Reset verification when contact info changes
   useEffect(() => {
     setPhoneVerified(false);
   }, [phoneNumber]);
-  
+
   useEffect(() => {
     setEmailVerified(false);
   }, [email]);
-  
+
   // Form submission
   function onSubmit(data: FormValues) {
+    console.log("Form data submitted:", data);
+    
+    // Check required fields
+    if (!data.location) {
+      toast.error("Please select a hospital branch.");
+      return;
+    }
+    
+    if (!data.doctor) {
+      toast.error("Please select a doctor.");
+      return;
+    }
+    
+    if (!data.appointmentDate || !data.appointmentTime) {
+      toast.error("Please select both appointment date and time.");
+      return;
+    }
+
     // Check if phone and email are verified
     if (!phoneVerified) {
-      toast("Phone verification required", {
-        description: "Please verify your phone number before submitting."
-      });
+      toast.error("Please verify your phone number before submitting.");
       return;
     }
-    
+
     if (!emailVerified) {
-      toast("Email verification required", {
-        description: "Please verify your email address before submitting."
-      });
+      toast.error("Please verify your email address before submitting.");
       return;
     }
+
+    // Convert appointment date and time to the format expected by the API
+    const appointmentDateTime = api.formatAppointmentDateTime(
+      data.appointmentDate,
+      data.appointmentTime
+    );
     
+    console.log("Formatted appointment datetime:", appointmentDateTime);
+
     // All verifications passed, submit the form
-    toast("Appointment Requested", {
-      description: "We'll confirm your appointment shortly."
-    });
-    console.log(data);
+    toast.success("Appointment Requested. We'll confirm your appointment shortly.");
+    
+    // Here you would add the API call to save the appointment
+    api.saveAppointment(data.doctor, appointmentDateTime, data.location)
+      .then(response => {
+        console.log("Appointment saved:", response);
+        if (response.appointment_id) {
+          toast.success(`Appointment confirmed! ID: ${response.appointment_id}`);
+        }
+      })
+      .catch(error => {
+        console.error("Error saving appointment:", error);
+        toast.error("Failed to save appointment. Please try again.");
+      });
   }
-  
+
   return (
     <div className="max-w-4xl mx-auto p-4 bg-white rounded-lg shadow-sm">
       <div className="mb-6">
@@ -339,26 +361,33 @@ const AppointmentForm = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Step 1: Select Department and Location */}
+          {/* Step 1: Select Department, Location, and Doctor (reorganized) */}
           <div>
-            <h2 className="text-xl font-semibold mb-4">Step 1: Select Department and Location</h2>
+            <h2 className="text-xl font-semibold mb-4">Step 1: Select Provider and Location</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Department selection */}
               <FormField
                 control={form.control}
                 name="specialty"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Specialty/Department <span className="text-red-500">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>Specialty/Department</FormLabel>
+                    <Select 
+                      onValueChange={(value) => {
+                        console.log("Selected specialty:", value);
+                        field.onChange(value);
+                      }} 
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select Specialty" />
+                          <SelectValue placeholder={isLoading ? "Loading..." : "Select Specialty"} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {specialties.map((specialty) => (
-                          <SelectItem key={specialty.id} value={specialty.id.toString()}>
-                            {specialty.name}
+                        {departments.map((dept) => (
+                          <SelectItem key={dept.dept_id} value={dept.dept_id}>
+                            {dept.dept_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -368,22 +397,29 @@ const AppointmentForm = () => {
                 )}
               />
 
+              {/* Hospital Branch selection */}
               <FormField
                 control={form.control}
                 name="location"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Hospital Branch <span className="text-red-500">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                      onValueChange={(value) => {
+                        console.log("Selected location:", value);
+                        field.onChange(value);
+                      }} 
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select Location" />
+                          <SelectValue placeholder={isLoading ? "Loading..." : "Select Location"} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {locations.map((location) => (
-                          <SelectItem key={location.id} value={location.id.toString()}>
-                            {location.name}
+                        {centers.map((center) => (
+                          <SelectItem key={center.center_id} value={center.center_id}>
+                            {center.center_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -393,46 +429,46 @@ const AppointmentForm = () => {
                 )}
               />
             </div>
-          </div>
 
-          {/* Step 2: Select Doctor */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Step 2: Select Doctor</h2>
-            <FormField
-              control={form.control}
-              name="doctor"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Choose a Doctor <span className="text-red-500">*</span></FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!specialty}>
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select Doctor" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {availableDoctors.map((doctor) => (
-                        <SelectItem key={doctor.id} value={doctor.id.toString()}>
-                          {doctor.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {!specialty && (
+            {/* Doctor selection */}
+            <div className="mt-6">
+              <FormField
+                control={form.control}
+                name="doctor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Choose a Doctor <span className="text-red-500">*</span></FormLabel>
+                    <Select 
+                      onValueChange={(value) => {
+                        console.log("Selected doctor:", value);
+                        field.onChange(value);
+                      }} 
+                      value={field.value || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={isLoading ? "Loading..." : "Select Doctor"} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableDoctors.map((doctor) => (
+                          <SelectItem key={doctor.doctor_id} value={doctor.doctor_id}>
+                            {doctor.doctor_name} - {doctor.dept_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormDescription>
-                      Please select a specialty first
+                      {specialty ? `Showing doctors from ${departments.find(d => d.dept_id === specialty)?.dept_name}` : 
+                        "All available doctors"}
                     </FormDescription>
-                  )}
-                  {specialty && availableDoctors.length === 3 && (
-                    <FormDescription>
-                      Showing top 3 doctors for this specialty
-                    </FormDescription>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
+            {/* Appointment Type */}
             <FormField
               control={form.control}
               name="appointmentType"
@@ -442,7 +478,7 @@ const AppointmentForm = () => {
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                       className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6"
                     >
                       <FormItem className="flex items-center space-x-2">
@@ -469,9 +505,9 @@ const AppointmentForm = () => {
             />
           </div>
 
-          {/* Step 3: Select Date and Time */}
+          {/* Step 2: Select Date and Time */}
           <div>
-            <h2 className="text-xl font-semibold mb-4">Step 3: Select Date and Time</h2>
+            <h2 className="text-xl font-semibold mb-4">Step 2: Select Date and Time</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
@@ -488,11 +524,12 @@ const AppointmentForm = () => {
                               "pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
+                            disabled={!doctor || availableDates.length === 0}
                           >
                             {field.value ? (
                               format(field.value, "PPP")
                             ) : (
-                              <span>Select date</span>
+                              <span>{!doctor ? "Select a doctor first" : "Select date"}</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -504,21 +541,24 @@ const AppointmentForm = () => {
                           selected={field.value}
                           onSelect={field.onChange}
                           disabled={(date) => {
-                            const today = new Date();
-                            today.setHours(0, 0, 0, 0);
+                            // Only allow dates from the available slots
+                            if (availableDates.length === 0) return true;
                             
-                            // Disable past dates and weekends
-                            return (
-                              date < today ||
-                              date.getDay() === 0 ||
-                              date.getDay() === 6
+                            return !availableDates.some(availableDate => 
+                              availableDate.getDate() === date.getDate() &&
+                              availableDate.getMonth() === date.getMonth() &&
+                              availableDate.getFullYear() === date.getFullYear()
                             );
                           }}
                           initialFocus
-                          className="p-3 pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>
+                    <FormDescription>
+                      {!doctor ? "Please select a doctor to see available dates" : 
+                       availableDates.length === 0 ? "No available dates for this doctor" : 
+                       "Select a highlighted date to see available times"}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -530,25 +570,32 @@ const AppointmentForm = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Appointment Time <span className="text-red-500">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!form.getValues("appointmentDate")}>
+                    <Select 
+                      onValueChange={(value) => {
+                        console.log("Selected time:", value);
+                        field.onChange(value);
+                      }} 
+                      value={field.value || ""} 
+                      disabled={!selectedDate || availableTimes.length === 0}
+                    >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select time slot" />
+                          <SelectValue placeholder={!selectedDate ? "Select date first" : "Select time slot"} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {timeSlots.map((time) => (
+                        {availableTimes.map((time) => (
                           <SelectItem key={time} value={time}>
                             {time}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    {!form.getValues("appointmentDate") && (
-                      <FormDescription>
-                        Please select a date first
-                      </FormDescription>
-                    )}
+                    <FormDescription>
+                      {!selectedDate ? "Please select a date first" : 
+                       availableTimes.length === 0 ? "No available times for selected date" : 
+                       `${availableTimes.length} available time slots`}
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -556,9 +603,9 @@ const AppointmentForm = () => {
             </div>
           </div>
 
-          {/* Step 4: Your Information */}
+          {/* Step 3: Your Information */}
           <div>
-            <h2 className="text-xl font-semibold mb-4">Step 4: Your Information</h2>
+            <h2 className="text-xl font-semibold mb-4">Step 3: Your Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
@@ -688,7 +735,7 @@ const AppointmentForm = () => {
             className={`w-full bg-blue-600 hover:bg-blue-700 ${(!phoneVerified || !emailVerified) ? 'opacity-70' : ''}`}
             size="lg"
           >
-            Verify & Book Appointment
+            Request Appointment
           </Button>
         </form>
       </Form>
